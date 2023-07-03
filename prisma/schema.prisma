@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Meal {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  mealName  String    @db.VarChar(255)
+  mealType  MealType
+  calories  Int?
+  isDeleted Boolean   @default(false)
+  day       Int
+  dayOfWeek Int
+  month     Int
+  year      Int
+  mealTags  MealTag[]
+  userId    String    @db.VarChar(32)
+}
+
+model Tag {
+  id           String    @id @default(uuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
+  tagName      String
+  isDeleted    Boolean   @default(false)
+  userId       String    @db.VarChar(32)
+  assignedTags MealTag[]
+}
+
+model MealTag {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  tagId     String
+  tag       Tag       @relation(fields: [tagId], references: [id])
+  isDeleted Boolean   @default(false)
+  Meal      Meal?     @relation(fields: [mealId], references: [id])
+  mealId    String?
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  SUPPER
+  BRUNCH
+}
